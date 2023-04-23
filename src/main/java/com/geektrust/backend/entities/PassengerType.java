@@ -1,6 +1,6 @@
 package com.geektrust.backend.entities;
 
-public enum MetroPassenger {
+public enum PassengerType {
     ADULT,
     SENIOR_CITIZEN,
     KID

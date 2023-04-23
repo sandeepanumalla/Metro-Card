@@ -13,12 +13,9 @@ public class MetroStation extends BaseEntity {
         return passengersTravelledSummary;
     }
 
-
     public void setPassengersTravelledSummary(Map<MetroCard, Integer> passengersTravelledSummary) {
         this.passengersTravelledSummary = passengersTravelledSummary;
     }
-
-
     public MetroStation(String id, String name, long collections, long totalDiscounts) {
             this.id = id;
             this.name = name;
@@ -71,11 +68,8 @@ public class MetroStation extends BaseEntity {
             return false;
         MetroStation other = (MetroStation) obj;
         if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        return true;
+            return other.id == null;
+        } else return id.equals(other.id);
     }
 
     @Override

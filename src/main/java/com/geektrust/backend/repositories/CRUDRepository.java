@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CRUDRepository<T, ID> {
-    T save(T entity);
+    void save(T entity);
     List<T> findAll();
     Optional<T> findById(ID id);
     boolean existsById(T entity);

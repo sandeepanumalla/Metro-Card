@@ -1,9 +1,8 @@
 package com.geektrust.backend.AppConfig;
 
 import com.geektrust.backend.entities.MetroCard;
-import com.geektrust.backend.repositories.IMetroCardRepository;
-import com.geektrust.backend.repositories.MetroCardRepository;
-import com.geektrust.backend.repositories.MetroStationRepository;
+import com.geektrust.backend.entities.MetroStation;
+import com.geektrust.backend.repositories.*;
 import com.geektrust.backend.service.IMetroCardService;
 import com.geektrust.backend.service.IMetroStationService;
 import com.geektrust.backend.service.MetroCardService;
@@ -16,18 +15,13 @@ import com.geektrust.backend.commands.PrintSummaryCommand;
 
 public class ApplicationConfig {
     IMetroCardRepository<MetroCard, String> metroCardRepository = new MetroCardRepository();
-    MetroStationRepository metroStationRepository  = new MetroStationRepository();
-
-    IMetroCardService<MetroCard> metroCardService = new MetroCardService(metroCardRepository, metroStationRepository);
-    IMetroStationService metroStationService = new MetroStationService(metroStationRepository, metroCardService);
-
+    IPassengerJourneyRepository passengerJourneyRepository = new PassengerJourneyRepository();
+    IMetroStationRepository<MetroStation, String> metroStationRepository  = new MetroStationRepository();
+    IMetroCardService<MetroCard> metroCardService = new MetroCardService(metroCardRepository, metroStationRepository, passengerJourneyRepository);
+    IMetroStationService<MetroStation> metroStationService = new MetroStationService(metroStationRepository, metroCardService, passengerJourneyRepository);
     ICommand createBalanceCommand = new BalanceCommand(metroCardService);
     ICommand createCheckInCommand = new CheckInCommand(metroStationService);
     ICommand createPrintSummaryCommand = new PrintSummaryCommand(metroStationService);
-
-    public void setCreateCheckCommand(ICommand createCheckInCommand) {
-        this.createCheckInCommand = createCheckInCommand;
-    }
 
     CommandInvoker commandInvoker = new CommandInvoker();
     

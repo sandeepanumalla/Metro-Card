@@ -1,24 +1,40 @@
 package com.geektrust.backend.service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import com.geektrust.backend.Utils.RechargeProcessor;
 import com.geektrust.backend.entities.MetroCard;
 import com.geektrust.backend.entities.MetroStation;
 import com.geektrust.backend.exceptions.MetroCardNotFoundException;
 import com.geektrust.backend.repositories.IMetroCardRepository;
+import com.geektrust.backend.repositories.IMetroStationRepository;
+import com.geektrust.backend.repositories.IPassengerJourneyRepository;
 import com.geektrust.backend.repositories.MetroStationRepository;
+import com.geektrust.backend.Utils.DiscountCalculator;
 
 public class MetroCardService implements IMetroCardService<MetroCard>{
 
-    private IMetroCardRepository<MetroCard, String> metroCardRepository;
-    private MetroStationRepository metroStationRepository;
+    private final IMetroCardRepository<MetroCard, String> metroCardRepository;
+    private final IMetroStationRepository<MetroStation, String> metroStationRepository;
+
+    private final IPassengerJourneyRepository passengerJourneyRepository;
     MetroStation metroStation = null;
-    private MetroCard metroCard;
+    private final DiscountCalculator discountCalculator;
+    private final RechargeProcessor rechargeProcessor;
+
+    private static final int PERCENT_CONVERSION_FACTOR = 100;
+    private static final long SERVICE_FEE_PERCENTAGE = 2;
 
     public MetroCardService(IMetroCardRepository<MetroCard, String> metroCardRepository,
-    MetroStationRepository metroStationRepository
+                            IMetroStationRepository<MetroStation, String> metroStationRepository,
+                            IPassengerJourneyRepository passengerJourneyRepository
     ){
         this.metroStationRepository = metroStationRepository;
         this.metroCardRepository = metroCardRepository;
+        this.discountCalculator = new DiscountCalculator();
+        this.rechargeProcessor = new RechargeProcessor();
+        this.passengerJourneyRepository = passengerJourneyRepository;
     }
 
     @Override
@@ -32,50 +48,28 @@ public class MetroCardService implements IMetroCardService<MetroCard>{
         return getMetroCard(MetroCardName).isPresent();
     }
 
-    public long applyDiscount(long journeyAmount, boolean isReturnJourney){
-        double discount = 0;
-        if(isReturnJourney){
-            discount = ((double)50 / 100 * 100 * journeyAmount/100); 
-            this.metroStation.updateTotalDiscounts((long)discount);
-        }
-        return (long)discount;
-    }
-
     @Override
-    public long walletCheckService(String passengerCard, String arrivedFromStation, boolean isReturnJourney) {
-        this.metroCard = getMetroCard(passengerCard).get();
-        long journeyAmount = metroStationRepository.
-                        getAmountRequiredForPassengerType(metroCard.getPassengerType());
+    public long processJourney(String passengerCard, String originStation, boolean isReturnJourney) {
+        MetroCard metroCard = getMetroCard(passengerCard).orElseThrow(() -> new MetroCardNotFoundException(passengerCard));
+        long journeyAmount = passengerJourneyRepository.getAmountRequiredForPassengerType(metroCard.getPassengerType());
         long balance = metroCard.getBalance();
-        long discount = 0;
         long rechargeAmount = 0;
-        long serviceFee = 0;
-        metroStation = metroStationRepository.find(arrivedFromStation)
-                                    .get();
-            discount = applyDiscount(journeyAmount, isReturnJourney);
-            journeyAmount -= discount;
-            if(balance - journeyAmount < 0){
-                rechargeAmount = journeyAmount - balance;  
-                 serviceFee = (long)Math.round(rechargeAmount * (double) 2 / 100);
-                 rechargePassengerMetroCard(metroCard, rechargeAmount + serviceFee);
-            }
-                metroStation.updateCollections(serviceFee + journeyAmount);
-                metroCard.checkInDeduction(journeyAmount + serviceFee);
-            return rechargeAmount + serviceFee;
-    }
-
-    @Override
-    public long rechargePassengerMetroCard(MetroCard passengerCard, Long amount) {
-        MetroCard metroCard = metroCardRepository
-                            .find(passengerCard.getName())
-                            .orElseThrow(() -> 
-                            new MetroCardNotFoundException(passengerCard.getName() + "not found!!"));
-        metroCard.doRecharge(amount);
-        return metroCard.getBalance();
+        long transactionFee  = 0;
+        metroStation = metroStationRepository.find(originStation).orElseThrow(()-> new NoSuchElementException(originStation + "Metro Station not found"));
+        long discount = discountCalculator.calculateDiscount(journeyAmount, isReturnJourney, metroStation);
+        journeyAmount = journeyAmount - discount;
+        if(balance < journeyAmount){
+            rechargeAmount = journeyAmount - balance;
+            transactionFee = Math.round((float) (rechargeAmount * SERVICE_FEE_PERCENTAGE) / PERCENT_CONVERSION_FACTOR);
+            rechargeProcessor.rechargePassengerMetroCard(metroCard, rechargeAmount + transactionFee);
+        }
+        metroStation.updateCollections(transactionFee + journeyAmount);
+        metroCard.checkInDeduction(journeyAmount + transactionFee);
+        return rechargeAmount + transactionFee;
     }
 
     @Override
     public Optional<MetroCard> getMetroCard(String MetroCardName) {
-         return metroCardRepository.find(MetroCardName);
+        return metroCardRepository.find(MetroCardName);
     }
 }

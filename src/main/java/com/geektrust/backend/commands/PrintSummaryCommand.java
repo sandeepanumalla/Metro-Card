@@ -12,7 +12,7 @@ public class PrintSummaryCommand implements ICommand{
     }
 
     @Override
-    public void execute(List<String> tokens) throws Exception {
+    public void execute(List<String> tokens) {
         metroStationService.printSummary();
     }
     

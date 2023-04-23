@@ -1,22 +1,17 @@
 package com.geektrust.backend.repositories;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import com.geektrust.backend.entities.MetroCard;
 import com.geektrust.backend.exceptions.MetroCardNotFoundException;
 
+import java.util.*;
+
 public class MetroCardRepository implements IMetroCardRepository<MetroCard, String>{
-    Map<String, MetroCard> metroCards = new HashMap<>(); 
-    Map<String, Long> amountRequired = new HashMap<>();
+    Map<String, MetroCard> metroCards = new HashMap<>();
 
     @Override
-    public MetroCard save(MetroCard entity) {
-        if(!existsById(entity)){
+    public void save(MetroCard entity) {
+        if(existsById(entity)){
             metroCards.put(entity.getName(), entity);
-            return entity;
         }
         else{
             throw new MetroCardNotFoundException();
@@ -25,7 +20,7 @@ public class MetroCardRepository implements IMetroCardRepository<MetroCard, Stri
 
     @Override
     public List<MetroCard> findAll() {
-        return metroCards.values().stream().collect(Collectors.toList());
+        return new ArrayList<>(metroCards.values());
     }
 
     @Override
@@ -34,13 +29,12 @@ public class MetroCardRepository implements IMetroCardRepository<MetroCard, Stri
     }
 
     public Optional<MetroCard> find(String name){
-        Optional<MetroCard> optional = Optional.of(metroCards.get(name));
-        return optional;
+        return Optional.of(metroCards.get(name));
     }
 
     @Override
     public boolean existsById(MetroCard entity) {
-        return metroCards.containsKey(entity.getName());
+        return !metroCards.containsKey(entity.getName());
     }
     
 }

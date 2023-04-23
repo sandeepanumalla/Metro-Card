@@ -12,12 +12,12 @@ import com.geektrust.backend.commands.CommandInvoker;
 public class App {
 
 	public static void run(List<String> commandArgs) {
-		// System.out.println(commandArgs);
 		ApplicationConfig applicationConfig = new ApplicationConfig();
 		CommandInvoker commandInvoker = applicationConfig.getCommandInvoker();
 		BufferedReader bufferedReader;
 		String inputFile = commandArgs.get(0).split("=")[1];
-		// String inputFile = "/home/crio-user/workspace/anumalla-sandeep1999-ME_GEEKTRUST_BACKEND/sample_input/input2.txt";
+		String basePath = "./sample_input/";
+		inputFile = basePath + inputFile;
 		System.out.println("input file "+inputFile);
 		try {
 			 bufferedReader = new BufferedReader(new FileReader(inputFile));
@@ -41,7 +41,6 @@ public class App {
 		 String actualSequence = commandLineArgs.stream()
                 .map(a -> a.split("=")[0])
                 .collect(Collectors.joining("$"));
-
 				if(expectedSequence.equals(actualSequence)){
 					run(commandLineArgs);
 				}

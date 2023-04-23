@@ -3,7 +3,7 @@ package com.geektrust.backend.entities;
 public class MetroCard extends BaseEntity{
     private String name ;
     private Long balance;
-    private MetroPassenger passengerType;
+    private PassengerType passengerType;
 
     public String getName() {
         return name;
@@ -12,7 +12,7 @@ public class MetroCard extends BaseEntity{
         this.name = name;
         this.balance = balance;
     }
-    public MetroCard(String name, Long balance, MetroPassenger passengerType) {
+    public MetroCard(String name, Long balance, PassengerType passengerType) {
         this.name = name;
         this.balance = balance;
         this.passengerType = passengerType;
@@ -23,7 +23,13 @@ public class MetroCard extends BaseEntity{
     public Long getBalance() {
         return balance;
     }
-    public void doRecharge(Long balance) {
+    public void doRecharge(Long balance) throws IllegalArgumentException, NullPointerException {
+        if(balance == null) {
+            throw new NullPointerException("Balance is null");
+        }
+        if(balance < 0) {
+            throw new IllegalArgumentException("Invalid amount" + balance);
+        }
         this.balance += balance;
     }
 
@@ -31,20 +37,21 @@ public class MetroCard extends BaseEntity{
         this.balance = this.balance- balance;
     }
 
-    public MetroPassenger getPassengerType() {
+    public PassengerType getPassengerType() {
         return passengerType;
     }
     public void setPassengerType(String passengerType) {
-        if(passengerType.equals("ADULT")){
-            this.passengerType = MetroPassenger.ADULT;
+        switch (passengerType) {
+            case "ADULT":
+                this.passengerType = PassengerType.ADULT;
+                break;
+            case "SENIOR_CITIZEN":
+                this.passengerType = PassengerType.SENIOR_CITIZEN;
+                break;
+            case "KID":
+                this.passengerType = PassengerType.KID;
+                break;
         }
-        else if(passengerType.equals("SENIOR_CITIZEN")){
-            this.passengerType = MetroPassenger.SENIOR_CITIZEN;
-        }
-        else if(passengerType.equals("KID")){
-            this.passengerType = MetroPassenger.KID;
-        }
-        // this.passengerType = passengerType;
     } 
     
     

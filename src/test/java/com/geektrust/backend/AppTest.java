@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 class AppTest {
 
     @Test
-    public void Application_Test() throws Exception{
+    public void Application_Test() {
         Assertions.assertTrue(true);
     }
 }
