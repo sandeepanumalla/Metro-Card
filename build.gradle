@@ -6,8 +6,8 @@ plugins {
 
 group = 'com.geektrust'
 version = '1.0'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.9
+targetCompatibility = 1.9
 
 jacoco { //Please do not change this
     toolVersion = "0.8.4"
@@ -50,6 +50,7 @@ repositories {
 dependencies {
 	testCompile 'org.mockito:mockito-junit-jupiter:3.3.3'
 	testCompile 'org.junit.jupiter:junit-jupiter:5.9.1'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.0'
 }
 
 test { ///Please do not change this

@@ -6,11 +6,11 @@ import java.util.Optional;
 import com.geektrust.backend.Utils.RechargeProcessor;
 import com.geektrust.backend.entities.MetroCard;
 import com.geektrust.backend.entities.MetroStation;
+import com.geektrust.backend.exceptions.InsufficientBalanceException;
 import com.geektrust.backend.exceptions.MetroCardNotFoundException;
 import com.geektrust.backend.repositories.IMetroCardRepository;
 import com.geektrust.backend.repositories.IMetroStationRepository;
 import com.geektrust.backend.repositories.IPassengerJourneyRepository;
-import com.geektrust.backend.repositories.MetroStationRepository;
 import com.geektrust.backend.Utils.DiscountCalculator;
 
 public class MetroCardService implements IMetroCardService<MetroCard>{
@@ -38,7 +38,7 @@ public class MetroCardService implements IMetroCardService<MetroCard>{
     }
 
     @Override
-    public void registerMetroCards(String MetroCardName, long walletBalance) {
+    public void registerMetroCard(String MetroCardName, long walletBalance) {
         MetroCard metroCard = new MetroCard(MetroCardName, walletBalance);
         this.metroCardRepository.save(metroCard);
     }
@@ -49,9 +49,9 @@ public class MetroCardService implements IMetroCardService<MetroCard>{
     }
 
     @Override
-    public long processJourney(String passengerCard, String originStation, boolean isReturnJourney) {
+    public long processJourney(String passengerCard, String originStation, boolean isReturnJourney) throws InsufficientBalanceException {
         MetroCard metroCard = getMetroCard(passengerCard).orElseThrow(() -> new MetroCardNotFoundException(passengerCard));
-        long journeyAmount = passengerJourneyRepository.getAmountRequiredForPassengerType(metroCard.getPassengerType());
+        long journeyAmount = passengerJourneyRepository.getFareByPassengerType(metroCard.getPassengerType());
         long balance = metroCard.getBalance();
         long rechargeAmount = 0;
         long transactionFee  = 0;
@@ -64,7 +64,7 @@ public class MetroCardService implements IMetroCardService<MetroCard>{
             rechargeProcessor.rechargePassengerMetroCard(metroCard, rechargeAmount + transactionFee);
         }
         metroStation.updateCollections(transactionFee + journeyAmount);
-        metroCard.checkInDeduction(journeyAmount + transactionFee);
+        metroCard.deductFare(journeyAmount + transactionFee);
         return rechargeAmount + transactionFee;
     }
 

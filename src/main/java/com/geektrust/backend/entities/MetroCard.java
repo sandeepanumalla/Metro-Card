@@ -1,5 +1,7 @@
 package com.geektrust.backend.entities;
 
+import com.geektrust.backend.exceptions.InsufficientBalanceException;
+
 public class MetroCard extends BaseEntity{
     private String name ;
     private Long balance;
@@ -33,8 +35,11 @@ public class MetroCard extends BaseEntity{
         this.balance += balance;
     }
 
-    public void checkInDeduction(Long balance){
-        this.balance = this.balance- balance;
+    public void deductFare(Long fare) throws InsufficientBalanceException {
+        if(fare > balance) {
+            throw new InsufficientBalanceException("Insufficient balance. Please recharge your card.");
+        }
+        this.balance -= fare;
     }
 
     public PassengerType getPassengerType() {
@@ -52,7 +57,5 @@ public class MetroCard extends BaseEntity{
                 this.passengerType = PassengerType.KID;
                 break;
         }
-    } 
-    
-    
+    }
 }

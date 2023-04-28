@@ -11,9 +11,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class MetroStationTest {
 
-    @DisplayName("")
+    @DisplayName("should increment passengers if already present in TravelledSummaryList")
       @Test
-      public void should_IncrementPassengers_IfAlreadyPresent_InTravelledSummaryList(){
+      public void testGetPassengersTravelledSummaryIfPassengersPresent(){
         String originStation = "AIRPORT";
         long balance = 600;
         MetroCard metroCard = new MetroCard("MC2", balance, PassengerType.ADULT);
@@ -33,7 +33,7 @@ public class MetroStationTest {
 
       @DisplayName("should increment passengers if not present in travelled summary list")
       @Test
-      public void should_IncrementPassengers_IfNotPresent_InTravelledSummaryList(){
+      public void testGetPassengersTravelledSummaryIfPassengersNotPresent(){
         String originStation = "AIRPORT";
         long balance = 600;
         MetroCard metroCard = new MetroCard("MC2", balance, PassengerType.ADULT);
@@ -42,4 +42,6 @@ public class MetroStationTest {
         int result = metroStation.getPassengersTravelledSummary().get(metroCard);
         assertEquals(1, result);
       }
+
+
 }

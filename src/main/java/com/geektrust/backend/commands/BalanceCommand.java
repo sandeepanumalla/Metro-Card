@@ -13,6 +13,6 @@ public class BalanceCommand implements ICommand{
 
     @Override
     public void execute(List<String> tokens) {
-        metroCardService.registerMetroCards(tokens.get(1), Long.parseLong(tokens.get(2)));
+        metroCardService.registerMetroCard(tokens.get(1), Long.parseLong(tokens.get(2)));
     }
 }

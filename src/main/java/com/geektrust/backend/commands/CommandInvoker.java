@@ -6,15 +6,15 @@ import java.util.Map;
 import com.geektrust.backend.exceptions.NoSuchCommandException;
 
 public class CommandInvoker {
-    Map<String, ICommand> commandRegistry = new HashMap<>();
-    public void register(String commandName,ICommand concreteCommand){
-        this.commandRegistry.put(commandName, concreteCommand);
+    Map<Command, ICommand> commandRegistry = new HashMap<>();
+    public void register(Command command,ICommand concreteCommand){
+        this.commandRegistry.put(command, concreteCommand);
     }
-    private ICommand get(String commandName){
+    public ICommand get(Command commandName){
         return commandRegistry.get(commandName);
     }
 
-    public void executeCommand(String commandName, List<String> tokens) throws Exception{
+    public void executeCommand(Command commandName, List<String> tokens) throws Exception{
         ICommand command = get(commandName);
         if(command == null){
             throw new NoSuchCommandException("at CommandInvoker");

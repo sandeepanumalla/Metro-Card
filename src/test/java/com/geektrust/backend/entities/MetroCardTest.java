@@ -1,5 +1,6 @@
 package com.geektrust.backend.entities;
 
+import com.geektrust.backend.exceptions.InsufficientBalanceException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ public class MetroCardTest {
 
     @DisplayName("should recharge the given MetroCard")
     @Test
-    public void doRechargeTest() {
+    public void doRechargeTest() throws InsufficientBalanceException {
 
         long rechargeAmount = 77;
 
@@ -108,15 +109,15 @@ public class MetroCardTest {
 
     @DisplayName("should deduct the amount from the MetroCard successfully")
     @Test
-    public void testCheckInDeduction() {
+    public void testCheckInDeduction() throws InsufficientBalanceException {
         long walletBalance = 200;
         long checkInAmount = 100;
 
-        doNothing().when(metroCard).checkInDeduction(checkInAmount);
+        doNothing().when(metroCard).deductFare(checkInAmount);
         when(metroCard.getBalance()).thenReturn(100L);
 
-        metroCard.checkInDeduction(checkInAmount);
-        verify(metroCard).checkInDeduction(checkInAmount);
+        metroCard.deductFare(checkInAmount);
+        verify(metroCard).deductFare(checkInAmount);
         long currentBalance = metroCard.getBalance();
         verify(metroCard).getBalance();
 

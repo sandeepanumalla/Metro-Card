@@ -44,10 +44,8 @@ public class MetroStation extends BaseEntity {
     
     public void updatePassengersTravelledSummary(MetroCard metroCard) {
             this.getPassengersTravelledSummary().computeIfPresent(metroCard, 
-            (K, V) -> V += 1);
-
-            this.getPassengersTravelledSummary().computeIfAbsent(metroCard, 
-            (K) -> 1);
+            (K, V) -> V + 1);
+            this.getPassengersTravelledSummary().putIfAbsent(metroCard, 1);
     }
 
     @Override

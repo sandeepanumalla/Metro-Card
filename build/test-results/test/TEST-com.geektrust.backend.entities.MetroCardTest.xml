@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geektrust.backend.entities.MetroCardTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2023-04-28T18:30:56" hostname="IN-PF2N9NY5" time="0.121">
+  <properties/>
+  <testcase name="doTestRechargeWithNullAmount()" classname="com.geektrust.backend.entities.MetroCardTest" time="0.082"/>
+  <testcase name="testGetName()" classname="com.geektrust.backend.entities.MetroCardTest" time="0.006"/>
+  <testcase name="setNameTest()" classname="com.geektrust.backend.entities.MetroCardTest" time="0.006"/>
+  <testcase name="testGetBalance()" classname="com.geektrust.backend.entities.MetroCardTest" time="0.003"/>
+  <testcase name="testSetPassengerType()" classname="com.geektrust.backend.entities.MetroCardTest" time="0.003"/>
+  <testcase name="doTestRechargeWithInvalidAmount()" classname="com.geektrust.backend.entities.MetroCardTest" time="0.008"/>
+  <testcase name="doRechargeTest()" classname="com.geektrust.backend.entities.MetroCardTest" time="0.002"/>
+  <testcase name="testCheckInDeduction()" classname="com.geektrust.backend.entities.MetroCardTest" time="0.003"/>
+  <testcase name="testGetPassengerType()" classname="com.geektrust.backend.entities.MetroCardTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

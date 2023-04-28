@@ -10,8 +10,8 @@ import java.util.Optional;
 
 public class PassengerJourneyRepository implements IPassengerJourneyRepository{
 
-    private Map<MetroCard, Integer> passengersReturnJourney = new HashMap<>();
-    private final Map<PassengerType, Integer> amountRequiredForPassengerType = new HashMap<PassengerType, Integer>(){
+    private Map<MetroCard, Integer> passengerTravelHistory = new HashMap<>();
+    private final Map<PassengerType, Integer> fareForPassengerType = new HashMap<PassengerType, Integer>(){
         {
             put(PassengerType.ADULT, 200);
             put(PassengerType.SENIOR_CITIZEN, 100);
@@ -20,23 +20,31 @@ public class PassengerJourneyRepository implements IPassengerJourneyRepository{
     };
 
     public void setPassengersReturnJourney(Map<MetroCard, Integer> passengersTravelled) {
-        passengersReturnJourney = passengersTravelled;
+        this.passengerTravelHistory = passengersTravelled;
     }
 
-    public long getAmountRequiredForPassengerType(PassengerType passenger) {
-        return this.amountRequiredForPassengerType.get(passenger);
+    public long getFareByPassengerType(PassengerType passenger) {
+        return this.fareForPassengerType.get(passenger);
     }
-    public void updatePassengerInReturnList( MetroCard metroCard) {
-        if(this.getPassengersReturnJourney().containsKey(metroCard)){
-            this.getPassengersReturnJourney().remove(metroCard);
+    public void updatePassengerTravelHistory( MetroCard metroCard) {
+        if(this.getPassengerTravelHistory().containsKey(metroCard)){
+            this.getPassengerTravelHistory().remove(metroCard);
         }
         else{
-            this.getPassengersReturnJourney().putIfAbsent(metroCard, 1);
+            this.getPassengerTravelHistory().putIfAbsent(metroCard, 1);
         }
     }
 
-    public Map<MetroCard, Integer> getPassengersReturnJourney() {
-        return passengersReturnJourney;
+    @Override
+    public void setFareByPassengerType(int fare, PassengerType passengerType) throws IllegalArgumentException {
+        if(fare < 0) {
+            throw new IllegalArgumentException("Negative values are not allowed to set fares for passenger type");
+        }
+        this.fareForPassengerType.putIfAbsent(passengerType, fare);
+    }
+
+    public Map<MetroCard, Integer> getPassengerTravelHistory() {
+        return passengerTravelHistory;
     }
     @Override
     public void save(PassengerType entity) {

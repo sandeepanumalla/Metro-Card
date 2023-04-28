@@ -1,15 +1,11 @@
 package com.geektrust.backend.repositories;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.util.HashMap;
-import java.util.Map;
-import com.geektrust.backend.entities.MetroCard;
-import com.geektrust.backend.entities.PassengerType;
+
 import com.geektrust.backend.entities.MetroStation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 @DisplayName("MetroStation Repository Test")
 public class MetroStationRepositoryTest {
@@ -67,6 +63,30 @@ public class MetroStationRepositoryTest {
 //      assertEquals(0, size);
 //    }
 //
+
+
+    @DisplayName("test if SetUpMetroStations() able to save metroStations properly")
+    @Test
+    public void testSetUpMetroStations() {
+
+        // Test that the method adds a metro station to the list
+        MetroStation station1 = new MetroStation("001", "Central Station", 10000, 5000);
+        MetroStation station2 = new MetroStation("002", "North Station", 5000, 2000);
+        MetroStation station3 = new MetroStation("003", "South Station", 8000, 4000);
+        MetroStation station4 = new MetroStation("004", "West Station", 8000, 4000);
+
+        metroStationRepository.setUpMetroStations(station1);
+        assertEquals(1, metroStationRepository.countStations());
+
+        // Test that the method adds multiple metro stations to the list
+        metroStationRepository.setUpMetroStations(station2);
+        metroStationRepository.setUpMetroStations(station3);
+        assertEquals(3, metroStationRepository.countStations());
+
+        // Test that the method adds the correct metro stations to the list
+        metroStationRepository.setUpMetroStations(station4);
+        assertEquals(4, metroStationRepository.countStations());
+    }
     void findById(){
         
     }

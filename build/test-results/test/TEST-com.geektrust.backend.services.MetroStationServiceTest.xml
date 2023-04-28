@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.geektrust.backend.services.MetroStationServiceTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-04-23T15:00:41" hostname="IN-PF2N9NY5" time="1.358">
+<testsuite name="com.geektrust.backend.services.MetroStationServiceTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2023-04-28T18:30:56" hostname="IN-PF2N9NY5" time="0.059">
   <properties/>
-  <testcase name="should_ReturnFalse_IfPassengerTravelsForFirstTime()" classname="com.geektrust.backend.services.MetroStationServiceTest" time="1.358"/>
+  <testcase name="should_ReturnFalse_IfPassengerTravelsForFirstTime()" classname="com.geektrust.backend.services.MetroStationServiceTest" time="0.041"/>
+  <testcase name="shouldDoCheckInProcess()" classname="com.geektrust.backend.services.MetroStationServiceTest" time="0.001"/>
+  <testcase name="should_ReturnTrue_IfPassengerTravelsForSecondTime()" classname="com.geektrust.backend.services.MetroStationServiceTest" time="0.015"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

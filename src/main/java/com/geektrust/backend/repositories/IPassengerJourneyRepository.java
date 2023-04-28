@@ -7,9 +7,11 @@ import java.util.Map;
 
 public interface IPassengerJourneyRepository extends  CRUDRepository<PassengerType, String> {
 
-    Map<MetroCard, Integer> getPassengersReturnJourney();
-    long getAmountRequiredForPassengerType(PassengerType passenger);
+    Map<MetroCard, Integer> getPassengerTravelHistory();
+    long getFareByPassengerType(PassengerType passenger);
     void setPassengersReturnJourney(Map<MetroCard, Integer> passengersTravelled);
-    void updatePassengerInReturnList( MetroCard metroCard);
+    void updatePassengerTravelHistory( MetroCard metroCard);
+
+    void setFareByPassengerType(int fare, PassengerType passengerType) throws IllegalArgumentException;
 }
 

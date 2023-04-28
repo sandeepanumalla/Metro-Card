@@ -1,7 +1,6 @@
 package com.geektrust.backend.Utils;
 
 import com.geektrust.backend.entities.MetroCard;
-import com.geektrust.backend.repositories.IMetroCardRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

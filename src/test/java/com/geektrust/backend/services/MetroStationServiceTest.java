@@ -3,6 +3,7 @@ package com.geektrust.backend.services;
 import com.geektrust.backend.entities.MetroCard;
 import com.geektrust.backend.entities.PassengerType;
 import com.geektrust.backend.repositories.MetroStationRepository;
+import com.geektrust.backend.repositories.PassengerJourneyRepository;
 import com.geektrust.backend.service.MetroCardService;
 import com.geektrust.backend.service.MetroStationService;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,8 @@ public class MetroStationServiceTest {
     @Mock
     private MetroCardService metroCardServiceMock;
 
+    @Mock
+    private PassengerJourneyRepository passengerJourneyRepository;
     @Mock
     private MetroStationRepository metroStationRepositoryMock;
 
@@ -84,8 +87,7 @@ public class MetroStationServiceTest {
           }
         };
 
-        when(metroStationRepositoryMock.getPassengersReturnJourney()).
-        thenReturn(passengerReturnJourneyList);
+        when(passengerJourneyRepository.getPassengerTravelHistory()).thenReturn(passengerReturnJourneyList);
 
         boolean result = metroStationServiceMock.isReturnJourney(metroCard);
         assertTrue(result);

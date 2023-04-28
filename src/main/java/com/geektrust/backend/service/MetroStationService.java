@@ -5,6 +5,7 @@ import java.util.*;
 import com.geektrust.backend.entities.MetroCard;
 import com.geektrust.backend.entities.MetroStation;
 import com.geektrust.backend.entities.PassengerType;
+import com.geektrust.backend.exceptions.InsufficientBalanceException;
 import com.geektrust.backend.exceptions.MetroCardNotFoundException;
 import com.geektrust.backend.repositories.IMetroStationRepository;
 import com.geektrust.backend.repositories.IPassengerJourneyRepository;
@@ -33,7 +34,7 @@ public class MetroStationService implements IMetroStationService<MetroStation>{
     
 
     @Override
-    public void doCheckInProgress(String passengerCard, String passengerType, String originStation) {
+    public void doCheckInProgress(String passengerCard, String passengerType, String originStation) throws InsufficientBalanceException {
         this.metroCard = metroCardService
                                         .getMetroCard(passengerCard)
                                         .orElseThrow(() -> 
@@ -47,8 +48,8 @@ public class MetroStationService implements IMetroStationService<MetroStation>{
 
     @Override
     public boolean isReturnJourney(MetroCard metroCard) {
-        boolean isReturnJourney = passengerJourneyRepository.getPassengersReturnJourney().containsKey(metroCard);
-        passengerJourneyRepository.updatePassengerInReturnList(metroCard);
+        boolean isReturnJourney = passengerJourneyRepository.getPassengerTravelHistory().containsKey(metroCard);
+        passengerJourneyRepository.updatePassengerTravelHistory(metroCard);
         return isReturnJourney;
     }
 
@@ -85,7 +86,6 @@ public class MetroStationService implements IMetroStationService<MetroStation>{
             entryList.clear();
     }
 
-
     private Map<PassengerType, Integer> createPassengerTypesMap(Map<MetroCard, Integer> passengersTravelledSummary) {
         Map<PassengerType, Integer> passengerTypesMap = new HashMap<>();
 
@@ -96,5 +96,4 @@ public class MetroStationService implements IMetroStationService<MetroStation>{
 
         return passengerTypesMap;
     }
-
 }

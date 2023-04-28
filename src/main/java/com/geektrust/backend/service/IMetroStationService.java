@@ -8,6 +8,4 @@ public interface IMetroStationService<MetroStation> {
     boolean isReturnJourney(MetroCard passengerCard);
     void doCheckInProgress(String passengerCard, String passengerType, String arrivedFrom) throws Exception;
     void printSummary();
-
-
 }
