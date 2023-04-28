@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.geektrust.backend.repositories.PassengerJourneyRepositoryTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2023-04-28T18:30:56" hostname="IN-PF2N9NY5" time="0.013">
-  <properties/>
-  <testcase name="testSetFareByPassengerType_newPassengerTypeDifferentValue()" classname="com.geektrust.backend.repositories.PassengerJourneyRepositoryTest" time="0.004"/>
-  <testcase name="testSetFareByPassengerType_newPassengerType()" classname="com.geektrust.backend.repositories.PassengerJourneyRepositoryTest" time="0.002"/>
-  <testcase name="testSetFareByPassengerType_newPassengerTypeNegativeValue()" classname="com.geektrust.backend.repositories.PassengerJourneyRepositoryTest" time="0.006"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.geektrust.backend.Utils.LoadDataTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-04-28T18:30:56" hostname="IN-PF2N9NY5" time="0.69">
-  <properties/>
-  <testcase name="testLoadData()" classname="com.geektrust.backend.Utils.LoadDataTest" time="0.69"/>
-  <system-out><![CDATA[com.geektrust.backend.AppConfig.ApplicationConfig@40dd5cb9
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

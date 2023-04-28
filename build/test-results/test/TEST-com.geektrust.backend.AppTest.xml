@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.geektrust.backend.AppTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-04-28T18:30:54" hostname="IN-PF2N9NY5" time="0.05">
-  <properties/>
-  <testcase name="Application_Test()" classname="com.geektrust.backend.AppTest" time="0.05"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
