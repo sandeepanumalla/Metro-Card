@@ -14,6 +14,6 @@ public class CheckInCommand implements ICommand{
 
     @Override
     public void execute(List<String> tokens) throws Exception {
-        metroStationService.doCheckInProgress(tokens.get(1), tokens.get(2), tokens.get(3));
+        metroStationService.updatePassengerJourneyProgress(tokens.get(1), tokens.get(2), tokens.get(3));
     }
 }

@@ -18,7 +18,7 @@ public class MetroCardTest {
 
     @DisplayName("should recharge the given MetroCard")
     @Test
-    public void doRechargeTest() throws InsufficientBalanceException {
+    public void doRechargeTest() {
 
         long rechargeAmount = 77;
 

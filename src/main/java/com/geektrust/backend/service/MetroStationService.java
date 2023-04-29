@@ -2,9 +2,10 @@ package com.geektrust.backend.service;
 
 import java.util.*;
 
+import com.geektrust.backend.Utils.DiscountCalculator;
+import com.geektrust.backend.Utils.RechargeProcessor;
 import com.geektrust.backend.entities.MetroCard;
 import com.geektrust.backend.entities.MetroStation;
-import com.geektrust.backend.entities.PassengerType;
 import com.geektrust.backend.exceptions.InsufficientBalanceException;
 import com.geektrust.backend.exceptions.MetroCardNotFoundException;
 import com.geektrust.backend.repositories.IMetroStationRepository;
@@ -13,87 +14,70 @@ import com.geektrust.backend.repositories.IPassengerJourneyRepository;
 public class MetroStationService implements IMetroStationService<MetroStation>{
     private final IMetroStationRepository<MetroStation, String> metroStationRepository;
     private final IMetroCardService<MetroCard> metroCardService;
-
+    private final IPassengerJourneyService passengerJourneyService;
+    private final int PERCENT_CONVERSION_FACTOR;
+    private final long SERVICE_FEE_PERCENTAGE;
     private final IPassengerJourneyRepository passengerJourneyRepository;
-    private MetroCard metroCard;
-    
+    MetroStation metroStation = null;
+    private final DiscountCalculator discountCalculator;
+    private final RechargeProcessor rechargeProcessor;
+
     public MetroStationService(IMetroStationRepository<MetroStation, String> metroStationRepository,
                                IMetroCardService<MetroCard> metroCardService,
-                               IPassengerJourneyRepository passengerJourneyRepository
-    ){
+                               IPassengerJourneyService passengerJourneyService,
+                               IPassengerJourneyRepository passengerJourneyRepository,
+                               DiscountCalculator discountCalculator, RechargeProcessor rechargeProcessor,
+                               int percentConversionFactor,
+                               long serviceFeePercentage
+                               ){
         this.metroStationRepository = metroStationRepository;
         this.metroCardService = metroCardService;
+        this.passengerJourneyService = passengerJourneyService;
         this.passengerJourneyRepository = passengerJourneyRepository;
-}
+        this.discountCalculator = discountCalculator;
+        this.rechargeProcessor = rechargeProcessor;
+        this.PERCENT_CONVERSION_FACTOR = percentConversionFactor;
+        this.SERVICE_FEE_PERCENTAGE = serviceFeePercentage;
+    }
 
     @Override
     public MetroStation getMetroStation(String metroStation) {
         return metroStationRepository.find(metroStation).orElseThrow(()->
                 new NoSuchElementException(metroStation + " metro station not found"));
     }
-    
 
-    @Override
-    public void doCheckInProgress(String passengerCard, String passengerType, String originStation) throws InsufficientBalanceException {
-        this.metroCard = metroCardService
-                                        .getMetroCard(passengerCard)
-                                        .orElseThrow(() -> 
-                                        new MetroCardNotFoundException("Metro Card not found"));
-
-        this.metroCard.setPassengerType(passengerType);
-        boolean isReturnJourney = isReturnJourney(this.metroCard);
-        metroCardService.processJourney(passengerCard, originStation, isReturnJourney);
-        getMetroStation(originStation).updatePassengersTravelledSummary(this.metroCard);
+    private long calculateJourneyFare(MetroCard metroCard, String originStation, boolean isReturnJourney) {
+        long journeyAmount = passengerJourneyRepository.getFareByPassengerType(metroCard.getPassengerType());
+        metroStation = metroStationRepository.find(originStation).orElseThrow(() -> new NoSuchElementException(originStation + "Metro Station not found"));
+        long discount = discountCalculator.calculateDiscount(journeyAmount, isReturnJourney, metroStation);
+        return journeyAmount - discount;
     }
 
     @Override
-    public boolean isReturnJourney(MetroCard metroCard) {
-        boolean isReturnJourney = passengerJourneyRepository.getPassengerTravelHistory().containsKey(metroCard);
-        passengerJourneyRepository.updatePassengerTravelHistory(metroCard);
-        return isReturnJourney;
-    }
-
-    public void printSummary() {
-        List<MetroStation> listOfStations =  metroStationRepository.findAll();
-        for (MetroStation station: listOfStations) {
-            printTotalCollection(station);
-            printPassengerTypeSummary(station);
+    public void deductJourneyFare(String passengerCard, String originStation, boolean isReturnJourney) throws InsufficientBalanceException {
+        MetroCard metroCard = metroCardService.getMetroCard(passengerCard).orElseThrow(() -> new MetroCardNotFoundException(passengerCard));
+        long journeyAmount = calculateJourneyFare(metroCard, originStation, isReturnJourney);
+        long balance = metroCard.getBalance();
+        long rechargeAmount;
+        long transactionFee  = 0;
+        if(balance < journeyAmount){
+            rechargeAmount = journeyAmount - balance;
+            transactionFee = Math.round((float) (rechargeAmount * SERVICE_FEE_PERCENTAGE) / PERCENT_CONVERSION_FACTOR);
+            rechargeProcessor.rechargePassengerMetroCard(metroCard, rechargeAmount + transactionFee);
         }
+        metroStation.updateCollections(transactionFee + journeyAmount);
+        metroCard.deductFare(journeyAmount + transactionFee);
     }
 
-    private void printTotalCollection(MetroStation station) {
-        System.out.print("TOTAL_COLLECTION ");
-        System.out.print(station.getName() + " ");
-        System.out.print(station.getCollections() + " ");
-        System.out.print(station.getTotalDiscounts() + "\n");
-    }
-
-    private void printPassengerTypeSummary(MetroStation station) {
-        System.out.println("PASSENGER_TYPE_SUMMARY");
-        Map<PassengerType, Integer> PassengerTypesMap = createPassengerTypesMap(station.getPassengersTravelledSummary());
-
-        List<Map.Entry<PassengerType, Integer>>  entryList = new ArrayList<>(PassengerTypesMap.entrySet());
-
-            entryList.sort((a, b) ->{
-                int condition = b.getValue().compareTo(a.getValue());
-                if(condition == 0){
-                    return a.getKey().compareTo(b.getKey());
-                }
-                return condition;
-            });
-            entryList.forEach(passenger -> System.out.println(passenger.getKey() + " " + passenger.getValue()));
-            PassengerTypesMap.clear();
-            entryList.clear();
-    }
-
-    private Map<PassengerType, Integer> createPassengerTypesMap(Map<MetroCard, Integer> passengersTravelledSummary) {
-        Map<PassengerType, Integer> passengerTypesMap = new HashMap<>();
-
-        for (Map.Entry<MetroCard, Integer> entry : passengersTravelledSummary.entrySet()) {
-            PassengerType passengerType = entry.getKey().getPassengerType();
-            passengerTypesMap.compute(passengerType, (k, v) -> (v == null) ? entry.getValue() : v + entry.getValue());
-        }
-
-        return passengerTypesMap;
+    @Override
+    public void updatePassengerJourneyProgress(String passengerCard, String passengerType, String originStation) throws InsufficientBalanceException {
+        MetroCard metroCard = metroCardService
+                .getMetroCard(passengerCard)
+                .orElseThrow(() ->
+                        new MetroCardNotFoundException("Metro Card not found"));
+        metroCard.setPassengerType(passengerType);
+        boolean isReturnJourney = passengerJourneyService.isReturnJourney(metroCard);
+        deductJourneyFare(passengerCard, originStation, isReturnJourney);
+        getMetroStation(originStation).updatePassengersTravelledSummary(metroCard);
     }
 }

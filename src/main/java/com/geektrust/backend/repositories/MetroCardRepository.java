@@ -7,7 +7,6 @@ import java.util.*;
 
 public class MetroCardRepository implements IMetroCardRepository<MetroCard, String>{
     Map<String, MetroCard> metroCards = new HashMap<>();
-
     @Override
     public void save(MetroCard entity) {
         if(existsById(entity)){
@@ -21,11 +20,6 @@ public class MetroCardRepository implements IMetroCardRepository<MetroCard, Stri
     @Override
     public List<MetroCard> findAll() {
         return new ArrayList<>(metroCards.values());
-    }
-
-    @Override
-    public Optional<MetroCard> findById(String id) {
-        return Optional.ofNullable(metroCards.get(id));
     }
 
     public Optional<MetroCard> find(String name){

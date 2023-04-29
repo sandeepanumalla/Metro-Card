@@ -26,7 +26,6 @@ public class CheckInCommandTest {
     @Test
     void testCheckInCommand() throws Exception {
         String metroCardName = "MC1";
-        String initialBalance = "400";
         String arrivedFrom = "CENTRAL";
         PassengerType passengerType = PassengerType.ADULT;
         List<String> tokens = new ArrayList<>(){{
@@ -37,8 +36,8 @@ public class CheckInCommandTest {
         }};
 
         CheckInCommand checkInCommand = new CheckInCommand(metroStationService);
-        doNothing().when(metroStationService).doCheckInProgress(passengerType.toString(),metroCardName,arrivedFrom);
+        doNothing().when(metroStationService).updatePassengerJourneyProgress(passengerType.toString(),metroCardName,arrivedFrom);
         checkInCommand.execute(tokens);
-        verify(metroStationService, times(1)).doCheckInProgress(passengerType.toString(), metroCardName, arrivedFrom);
+        verify(metroStationService, times(1)).updatePassengerJourneyProgress(passengerType.toString(), metroCardName, arrivedFrom);
     }
 }

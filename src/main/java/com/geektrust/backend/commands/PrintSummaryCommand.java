@@ -2,19 +2,18 @@ package com.geektrust.backend.commands;
 
 import java.util.List;
 
-import com.geektrust.backend.entities.MetroStation;
-import com.geektrust.backend.service.IMetroStationService;
+import com.geektrust.backend.service.IConsolePrinterService;
 
 public class PrintSummaryCommand implements ICommand{
 
-    IMetroStationService<MetroStation> metroStationService;
+    IConsolePrinterService consolePrinterService;
 
-    public PrintSummaryCommand(IMetroStationService<MetroStation> metroStationService){
-        this.metroStationService = metroStationService;
+    public PrintSummaryCommand(IConsolePrinterService consolePrinterService){
+        this.consolePrinterService = consolePrinterService;
     }
 
     @Override
     public void execute(List<String> tokens) {
-        metroStationService.printSummary();
+        consolePrinterService.printSummary();
     }
 }

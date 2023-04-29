@@ -1,63 +1,55 @@
-package com.geektrust.backend.AppConfig;
+    package com.geektrust.backend.AppConfig;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.geektrust.backend.commands.*;
-import com.geektrust.backend.entities.MetroCard;
-import com.geektrust.backend.entities.MetroStation;
-import com.geektrust.backend.entities.PassengerType;
-import com.geektrust.backend.repositories.*;
-import com.geektrust.backend.service.IMetroCardService;
-import com.geektrust.backend.service.IMetroStationService;
-import com.geektrust.backend.service.MetroCardService;
-import com.geektrust.backend.service.MetroStationService;
+    import com.geektrust.backend.Utils.DiscountCalculator;
+    import com.geektrust.backend.Utils.RechargeProcessor;
+    import com.geektrust.backend.commands.*;
+    import com.geektrust.backend.data.LoadProperties;
+    import com.geektrust.backend.data.MetroStationDataLoader;
+    import com.geektrust.backend.data.PassengerFaresLoader;
+    import com.geektrust.backend.entities.MetroCard;
+    import com.geektrust.backend.entities.MetroStation;
+    import com.geektrust.backend.repositories.*;
+    import com.geektrust.backend.service.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+    public class ApplicationConfig {
 
-public class ApplicationConfig {
-
-    public ApplicationConfig() {
-        this.loadMetroStationsData();
-        this.loadPassengerFares();
-    }
-    IMetroCardRepository<MetroCard, String> metroCardRepository = new MetroCardRepository();
-    IPassengerJourneyRepository passengerJourneyRepository = new PassengerJourneyRepository();
-    IMetroStationRepository<MetroStation, String> metroStationRepository  = new MetroStationRepository();
-    IMetroCardService<MetroCard> metroCardService = new MetroCardService(metroCardRepository, metroStationRepository, passengerJourneyRepository);
-    IMetroStationService<MetroStation> metroStationService = new MetroStationService(metroStationRepository, metroCardService, passengerJourneyRepository);
-    ICommand createBalanceCommand = new BalanceCommand(metroCardService);
-    ICommand createCheckInCommand = new CheckInCommand(metroStationService);
-    ICommand createPrintSummaryCommand = new PrintSummaryCommand(metroStationService);
-    CommandInvoker commandInvoker = new CommandInvoker();
-
-    public void loadPassengerFares() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        InputStream inputStream = getClass().getResourceAsStream("/fares_for_passenger.json");
-        HashMap<String, Integer> passengerFaresMap;
-        try {
-            passengerFaresMap = objectMapper.readValue(inputStream, new TypeReference<>() {
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        public ApplicationConfig() {
+            this.loadPassengerFares();
+            this.loadMetroStationsData();
         }
-        for(Map.Entry<String, Integer> entry: passengerFaresMap.entrySet()) {
-            PassengerType passengerType = PassengerType.valueOf(entry.getKey());
-            passengerJourneyRepository.setFareByPassengerType(entry.getValue(), passengerType);
+        IMetroCardRepository<MetroCard, String> metroCardRepository = new MetroCardRepository();
+        IPassengerJourneyRepository passengerJourneyRepository = new PassengerJourneyRepository();
+        IMetroStationRepository<MetroStation, String> metroStationRepository  = new MetroStationRepository();
+        IPassengerJourneyService passengerJourneyService = new PassengerJourneyService(passengerJourneyRepository);
+        IMetroCardService<MetroCard> metroCardService = new MetroCardService(metroCardRepository);
+        private final DiscountCalculator discountCalculator = new DiscountCalculator();
+        private final RechargeProcessor rechargeProcessor = new RechargeProcessor();
+
+        int percentageConversionFactor = Integer.parseInt(LoadProperties.getProperty("percentage.conversion.factor"));
+        long serviceFeePercentage = Long.parseLong(LoadProperties.getProperty("service.fee.percentage"));
+        IMetroStationService<MetroStation> metroStationService = new MetroStationService(metroStationRepository, metroCardService,
+                passengerJourneyService, passengerJourneyRepository, discountCalculator, rechargeProcessor, percentageConversionFactor, serviceFeePercentage);
+        IConsolePrinterService consolePrinterService = new ConsolePrinterService(metroStationRepository, passengerJourneyService);
+
+        public void loadPassengerFares() {
+            PassengerFaresLoader passengerFaresLoader = new PassengerFaresLoader(passengerJourneyRepository);
+            passengerFaresLoader.loadPassengerFares();
+        }
+
+        public void loadMetroStationsData() {
+            MetroStationDataLoader metroStationDataLoader = new MetroStationDataLoader(metroStationRepository);
+            metroStationDataLoader.loadMetroStationsData();
+        }
+
+        ICommand createBalanceCommand = new BalanceCommand(metroCardService);
+        ICommand createCheckInCommand = new CheckInCommand(metroStationService);
+        ICommand createPrintSummaryCommand = new PrintSummaryCommand(consolePrinterService);
+        CommandInvoker commandInvoker = new CommandInvoker();
+
+        public CommandInvoker getCommandInvoker(){
+            commandInvoker.register(Command.BALANCE, createBalanceCommand);
+            commandInvoker.register(Command.CHECK_IN, createCheckInCommand);
+            commandInvoker.register(Command.PRINT_SUMMARY, createPrintSummaryCommand);
+            return commandInvoker;
         }
     }
-
-    public void loadMetroStationsData() {
-        metroStationRepository.setUpMetroStations(new MetroStation("1", "CENTRAL", 0, 0));
-        metroStationRepository.setUpMetroStations(new MetroStation("2", "AIRPORT", 0,0));
-    }
-    
-    public CommandInvoker getCommandInvoker(){
-        commandInvoker.register(Command.BALANCE, createBalanceCommand);
-        commandInvoker.register(Command.CHECK_IN, createCheckInCommand);
-        commandInvoker.register(Command.PRINT_SUMMARY, createPrintSummaryCommand);
-        return commandInvoker;
-    }
-}

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MetroStation extends BaseEntity {
-    private String name;
+    private final String name;
     private long Collections;
     private long TotalDiscounts;
     private Map<MetroCard, Integer> passengersTravelledSummary = new HashMap<>();
@@ -25,9 +25,6 @@ public class MetroStation extends BaseEntity {
 
     public String getName() {
         return name;
-    }
-    public void setName(String name) {
-        this.name = name;
     }
     public long getCollections() {
         return Collections;

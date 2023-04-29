@@ -1,10 +1,7 @@
 package com.geektrust.backend.Commands;
 
-import com.geektrust.backend.commands.CheckInCommand;
 import com.geektrust.backend.commands.PrintSummaryCommand;
-import com.geektrust.backend.entities.MetroStation;
-import com.geektrust.backend.entities.PassengerType;
-import com.geektrust.backend.service.IMetroStationService;
+import com.geektrust.backend.service.IConsolePrinterService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,17 +17,16 @@ import static org.mockito.Mockito.*;
 public class PrintSummaryCommandTest {
 
     @Mock
-    IMetroStationService<MetroStation> metroStationService;
-
+    IConsolePrinterService consolePrinterService;
 
     @DisplayName("check if printSummary command calls the printSummary()")
     @Test
     void testPrintSummaryCommandTest() throws Exception {
         List<String> tokens = new ArrayList<>(){{}};
 
-        PrintSummaryCommand printSummaryCommand = new PrintSummaryCommand(metroStationService);
-        doNothing().when(metroStationService).printSummary();
+        PrintSummaryCommand printSummaryCommand = new PrintSummaryCommand(consolePrinterService);
+        doNothing().when(consolePrinterService).printSummary();
         printSummaryCommand.execute(tokens);
-        verify(metroStationService, times(1)).printSummary();
+        verify(consolePrinterService, times(1)).printSummary();
     }
 }

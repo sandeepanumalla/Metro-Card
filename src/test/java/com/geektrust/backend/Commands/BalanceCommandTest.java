@@ -31,7 +31,6 @@ public class BalanceCommandTest {
         }};
 
         BalanceCommand balanceCommand = new BalanceCommand(metroCardService);
-
         doNothing().when(metroCardService).registerMetroCard(metroCardName, Long.parseLong(initialBalance));
         balanceCommand.execute(tokens);
         verify(metroCardService, times(1)).registerMetroCard(metroCardName, Long.parseLong(initialBalance));
