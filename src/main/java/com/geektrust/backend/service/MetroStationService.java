@@ -46,7 +46,8 @@ public class MetroStationService implements IMetroStationService<MetroStation>{
                 new NoSuchElementException(metroStation + " metro station not found"));
     }
 
-    private long calculateJourneyFare(MetroCard metroCard, String originStation, boolean isReturnJourney) {
+    @Override
+    public long calculateJourneyFare(MetroCard metroCard, String originStation, boolean isReturnJourney) {
         long journeyAmount = passengerJourneyRepository.getFareByPassengerType(metroCard.getPassengerType());
         metroStation = metroStationRepository.find(originStation).orElseThrow(() -> new NoSuchElementException(originStation + "Metro Station not found"));
         long discount = discountCalculator.calculateDiscount(journeyAmount, isReturnJourney, metroStation);

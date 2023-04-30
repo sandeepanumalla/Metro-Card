@@ -2,6 +2,7 @@ package com.geektrust.backend.Utils;
 
 import com.geektrust.backend.entities.MetroStation;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +14,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class DiscountCalculatorTest {
 
-    @InjectMocks
+
     DiscountCalculator discountCalculator;
+
+
+    @BeforeEach
+    void setup() {
+         final double RETURN_JOURNEY_DISCOUNT_PERCENTAGE = 50;
+         final int PERCENT_CONVERSION_FACTOR = 100;
+        discountCalculator = new DiscountCalculator(RETURN_JOURNEY_DISCOUNT_PERCENTAGE, PERCENT_CONVERSION_FACTOR);
+    }
 
     @Mock
     MetroStation metroStation;

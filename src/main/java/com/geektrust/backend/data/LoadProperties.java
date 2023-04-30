@@ -16,7 +16,6 @@ public class LoadProperties {
             throw new RuntimeException(e);
         }
     }
-
     public static String getProperty(String key) {
         return properties.getProperty(key);
     }

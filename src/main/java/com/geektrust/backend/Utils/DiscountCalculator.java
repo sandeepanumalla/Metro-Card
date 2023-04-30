@@ -4,9 +4,13 @@ import com.geektrust.backend.entities.MetroStation;
 
 public class DiscountCalculator {
 
-    private static final double RETURN_JOURNEY_DISCOUNT_PERCENTAGE = 50.0;
-    private static final int PERCENT_CONVERSION_FACTOR = 100;
+    private final double RETURN_JOURNEY_DISCOUNT_PERCENTAGE;
+    private final int PERCENT_CONVERSION_FACTOR;
 
+    public DiscountCalculator(double discountPercentage, int percentageConversionFactor) {
+        this.RETURN_JOURNEY_DISCOUNT_PERCENTAGE = discountPercentage;
+        this.PERCENT_CONVERSION_FACTOR = percentageConversionFactor;
+    }
     public long calculateDiscount(long journeyAmount, boolean isReturnJourney,
                                   MetroStation metroStation) {
         double discount = 0;
@@ -16,5 +20,4 @@ public class DiscountCalculator {
         }
         return (long)discount;
     }
-
 }

@@ -22,11 +22,14 @@
         IMetroStationRepository<MetroStation, String> metroStationRepository  = new MetroStationRepository();
         IPassengerJourneyService passengerJourneyService = new PassengerJourneyService(passengerJourneyRepository);
         IMetroCardService<MetroCard> metroCardService = new MetroCardService(metroCardRepository);
-        private final DiscountCalculator discountCalculator = new DiscountCalculator();
+
         private final RechargeProcessor rechargeProcessor = new RechargeProcessor();
 
         int percentageConversionFactor = Integer.parseInt(LoadProperties.getProperty("percentage.conversion.factor"));
         long serviceFeePercentage = Long.parseLong(LoadProperties.getProperty("service.fee.percentage"));
+        long discountPercentage = Long.parseLong(LoadProperties.getProperty("return.journey.discount.percentage"));
+
+        private final DiscountCalculator discountCalculator = new DiscountCalculator(discountPercentage, percentageConversionFactor);
         IMetroStationService<MetroStation> metroStationService = new MetroStationService(metroStationRepository, metroCardService,
                 passengerJourneyService, passengerJourneyRepository, discountCalculator, rechargeProcessor, percentageConversionFactor, serviceFeePercentage);
         IConsolePrinterService consolePrinterService = new ConsolePrinterService(metroStationRepository, passengerJourneyService);

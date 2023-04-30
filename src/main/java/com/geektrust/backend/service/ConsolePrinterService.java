@@ -10,6 +10,11 @@ import java.util.Map;
 
 public class ConsolePrinterService implements IConsolePrinterService{
 
+    private static final String TOTAL_COLLECTION = "TOTAL_COLLECTION ";
+    private static final String PASSENGER_TYPE_SUMMARY = "PASSENGER_TYPE_SUMMARY";
+    private static final String SPACE = " ";
+    private static final String NEWLINE = "\n";
+
     final  IMetroStationRepository<MetroStation, String> metroStationRepository;
     final IPassengerJourneyService passengerJourneyService;
     public ConsolePrinterService(IMetroStationRepository<MetroStation, String> metroStationRepository, IPassengerJourneyService passengerJourneyService) {
@@ -25,20 +30,20 @@ public class ConsolePrinterService implements IConsolePrinterService{
     }
 
     public void printTotalCollection(MetroStation station) {
-        System.out.print("TOTAL_COLLECTION ");
-        System.out.print(station.getName() + " ");
-        System.out.print(station.getCollections() + " ");
-        System.out.print(station.getTotalDiscounts() + "\n");
+        System.out.print(TOTAL_COLLECTION);
+        System.out.print(station.getName() + SPACE);
+        System.out.print(station.getCollections() + SPACE);
+        System.out.print(station.getTotalDiscounts() + NEWLINE);
     }
 
     public void printPassengerTypeSummary(MetroStation station) {
-        System.out.println("PASSENGER_TYPE_SUMMARY");
+        System.out.println(PASSENGER_TYPE_SUMMARY);
         Map<PassengerType, Integer> PassengerTypesMap = passengerJourneyService
                             .createPassengerTypesMap(station.getPassengersTravelledSummary());
 
         List<Map.Entry<PassengerType, Integer>> entryList = new ArrayList<>(PassengerTypesMap.entrySet());
         sortPassengers(entryList);
-        entryList.forEach(passenger -> System.out.println(passenger.getKey() + " " + passenger.getValue()));
+        entryList.forEach(passenger -> System.out.println(passenger.getKey() + SPACE + passenger.getValue()));
         PassengerTypesMap.clear();
         entryList.clear();
     }

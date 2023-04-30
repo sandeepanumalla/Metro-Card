@@ -45,6 +45,6 @@ public class PassengerJourneyRepositoryTest {
         int fare3 = -50;
         assertThrows(IllegalArgumentException.class, () -> passengerJourneyRepository.setFareByPassengerType(fare3, passengerType3));
 
-        assertNotEquals(fare3, passengerJourneyRepository.getFareByPassengerType(passengerType3));
+        assertThrows(NullPointerException.class, () -> passengerJourneyRepository.getFareByPassengerType(passengerType3));
     }
 }

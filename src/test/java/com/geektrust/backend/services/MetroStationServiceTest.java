@@ -5,109 +5,25 @@ import com.geektrust.backend.Utils.RechargeProcessor;
 import com.geektrust.backend.data.LoadProperties;
 import com.geektrust.backend.entities.MetroCard;
 import com.geektrust.backend.entities.MetroStation;
+import com.geektrust.backend.entities.PassengerType;
+import com.geektrust.backend.exceptions.InsufficientBalanceException;
 import com.geektrust.backend.repositories.IMetroStationRepository;
 import com.geektrust.backend.repositories.IPassengerJourneyRepository;
 import com.geektrust.backend.repositories.MetroStationRepository;
 import com.geektrust.backend.repositories.PassengerJourneyRepository;
 import com.geektrust.backend.service.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-//@ExtendWith(MockitoExtension.class)
-//public class MetroStationServiceTest {
-//
-//    @Mock
-//    private MetroCardService metroCardServiceMock;
-//
-//    @Mock
-//    private PassengerJourneyRepository passengerJourneyRepository;
-//    @Mock
-//    private MetroStationRepository metroStationRepositoryMock;
-//
-//    @Mock
-//    private LoadProperties mockProperties;
-//
-//    @InjectMocks
-//    private MetroStationService metroStationServiceMock;
-//
-//    @BeforeEach
-//    public void setup() {
-//        MockitoAnnotations.initMocks(this);
-//    }
-//
-//    @Test
-//    public void shouldDoCheckInProcess() {
-//        // given
-//        // String passengerCard = "MC3";
-//        // String passengerType = "SENIOR_CITIZEN";
-//        // String originStation = "AIRPORT";
-//        // long balance = 25;
-//        // MetroStation metroStation = new MetroStation("1", originStation, 0, 0);
-//        // MetroCard metroCard = new MetroCard(passengerCard, balance);
-//        // Map<MetroCard, Integer> passengerReturnJourneyList = new HashMap<MetroCard, Integer>(){
-//        //   {
-//        //     put(metroCard, 1);
-//        //   }
-//        // };
-//        // metroStation.updatePassengersTravelledSummary(metroCard);
-//
-//
-//        // doReturn(Optional.ofNullable(metroCard)).when(metroCardServiceMock)
-//        //                                         .getMetroCard(anyString());
-//
-//        // doReturn(passengerReturnJourneyList).when(metroStationRepositoryMock)
-//        //                                     .getPassengersReturnJourney();
-//
-//        // metroStationServiceMock.doCheckInProgress(passengerCard, passengerType, originStation);
-//
-//        // // long totalCollections = metroStation.getCollections();
-//        // // long totalDiscounts = metroStation.getTotalDiscounts();
-//        // int passengerCount = metroStation.getPassengersTravelledSummary().get(metroCard);
-//        // // assertEquals(101, totalCollections);
-//        // // assertEquals(50, totalDiscounts);
-//        // assertEquals(2, passengerCount);
-//
-//    }
-//
-//    @Test
-//    public void testGetMetroStation() {
-//        // Create a mock IMetroStationRepository
-//
-//        // Create a test MetroStation object
-//        String testStationName = "Test Station";
-//        MetroStation testStation = new MetroStation("004", "West Station", 8000, 4000);
-//
-//
-//        // Set up mock repository to return the test MetroStation object when find() is called with the test station name
-//        when(metroStationRepositoryMock.find(testStationName)).thenReturn(Optional.of(testStation));
-//
-//        // Create a MetroStationService object with the mock repository
-//        MetroStationService service = new MetroStationService(metroStationRepositoryMock, null, null, null, null, null);
-//
-//        // Test scenario 1: Valid metroStation argument
-//        MetroStation result = service.getMetroStation(testStationName);
-//        assertEquals(testStation, result);
-//
-//        // Test scenario 2: Invalid metroStation argument
-//        String invalidStationName = "Invalid Station";
-//        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> service.getMetroStation(invalidStationName));
-//        assertEquals(invalidStationName + " metro station not found", exception.getMessage());
-//    }
-//
-//}
 @ExtendWith(MockitoExtension.class)
 public class MetroStationServiceTest {
 
@@ -129,13 +45,12 @@ public class MetroStationServiceTest {
     @Mock
     RechargeProcessor rechargeProcessor;
 
-    private int percentConversionFactor = 50;
-    private long serviceFeePercentage = 2L;
-
     IMetroStationService<MetroStation> metroStationService;
 
     @BeforeEach
     public void MetroStationServiceSetup() {
+        int percentConversionFactor = 100;
+        long serviceFeePercentage = 2L;
         metroStationService = new MetroStationService(
                 metroStationRepository,
                 metroCardService,
@@ -148,7 +63,87 @@ public class MetroStationServiceTest {
         );
     }
 
+    @Test
+    void shouldCorrectlyCalculateJourneyFare_IfReturnJourney() {
+        MetroCard metroCard = new MetroCard("MC1", 50L, PassengerType.SENIOR_CITIZEN);
+        MetroStation station4 = new MetroStation("004", "AIRPORT", 8000, 4000);
+        when(passengerJourneyRepository.getFareByPassengerType(metroCard.getPassengerType())).thenReturn(100L);
+        when(metroStationRepository.find(anyString())).thenReturn(Optional.of(station4));
+        when(discountCalculator.calculateDiscount(100L, true, station4)).thenReturn(50L);
+        long journeyAmount = metroStationService.calculateJourneyFare(metroCard, "AIRPORT",true);
 
+        verify(passengerJourneyRepository, times(1)).getFareByPassengerType(metroCard.getPassengerType());
+        verify(metroStationRepository, times(1)).find(anyString());
+        Assertions.assertEquals(50L, journeyAmount);
+    }
 
+    @Test
+    void shouldCorrectlyCalculateJourneyFare_IfNotReturnJourney() {
+        MetroCard metroCard = new MetroCard("MC1", 50L, PassengerType.SENIOR_CITIZEN);
+        MetroStation station4 = new MetroStation("004", "AIRPORT", 8000, 4000);
+        when(passengerJourneyRepository.getFareByPassengerType(metroCard.getPassengerType())).thenReturn(100L);
+        when(metroStationRepository.find(anyString())).thenReturn(Optional.of(station4));
+        when(discountCalculator.calculateDiscount(100L, false, station4)).thenReturn(0L);
+        long journeyAmount = metroStationService.calculateJourneyFare(metroCard, "AIRPORT",false);
+
+        verify(passengerJourneyRepository, times(1)).getFareByPassengerType(metroCard.getPassengerType());
+        verify(metroStationRepository, times(1)).find(anyString());
+        Assertions.assertEquals(100L, journeyAmount);
+    }
+
+//    @Test
+//    public void  testUpdatePassengerJourneyProcessIfBalanceIsNotEnough() throws InsufficientBalanceException {
+//        String passengerCard = "MC1";
+//        String originStation = "AIRPORT";
+//
+//        boolean isReturn = false;
+//        MetroCard metroCard = new MetroCard("MC1", 50L, PassengerType.SENIOR_CITIZEN);
+//
+//        MetroStation station4 = new MetroStation("004", "AIRPORT", 8000, 4000);
+//        when(metroCardService.getMetroCard(metroCard.getName())).thenReturn(Optional.of(metroCard));
+//        when(passengerJourneyRepository.getFareByPassengerType(metroCard.getPassengerType())).thenReturn(100L);
+//        when(metroStationRepository.find(originStation)).thenReturn(Optional.of(station4));
+//        when(discountCalculator.calculateDiscount(100L, false, station4)).thenReturn(0L);
+//        when(rechargeProcessor.rechargePassengerMetroCard(metroCard,51L)).thenReturn((long)(metroCard.getBalance() + 51L));
+//        doReturn(101L).when(metroCard).getBalance();
+//        metroStationService.deductJourneyFare(passengerCard, originStation, isReturn);
+//
+//        verify(rechargeProcessor, times(1)).rechargePassengerMetroCard(metroCard, anyLong());
+//        verify(station4, times(1)).updateCollections(anyLong());
+//    }
+
+//    @Test
+//    public void testDeductJourneyFare() throws InsufficientBalanceException {
+//        // Arrange
+//        String passengerCard = "MC1";
+//        String originStation = "STATION1";
+//        boolean isReturnJourney = false;
+//        long journeyAmount = 100L;
+//        long balance = 50L;
+//        long rechargeAmount = journeyAmount - balance;
+//        long transactionFee = Math.round((float) (rechargeAmount * 2) / 100);
+//        long totalAmount = journeyAmount + transactionFee;
+//
+//        MetroCard metroCard = new MetroCard(passengerCard, balance, PassengerType.SENIOR_CITIZEN);
+//        MetroStation metroStation = new MetroStation("STATION1", "Station 1", 100, 100);
+//        when(discountCalculator.calculateDiscount(anyLong(), isReturnJourney, metroStation)).thenReturn(0L);
+//        when(metroStationRepository.find(anyString())).thenReturn(Optional.of(metroStation));
+//        when(metroCardService.getMetroCard(passengerCard)).thenReturn(Optional.of(metroCard));
+//        when(metroStationService.calculateJourneyFare(metroCard, originStation, isReturnJourney)).thenReturn(journeyAmount);
+//
+//        ArgumentCaptor<Long> rechargeAmountCaptor = ArgumentCaptor.forClass(Long.class);
+//        doNothing().when(rechargeProcessor).rechargePassengerMetroCard(eq(metroCard), rechargeAmountCaptor.capture());
+//
+//        // Act
+//        metroStationService.deductJourneyFare(passengerCard, originStation, isReturnJourney);
+//
+//        // Assert
+//        long actualRechargeAmount = rechargeAmountCaptor.getValue();
+//        Assertions.assertEquals(rechargeAmount + transactionFee, actualRechargeAmount);
+//
+//        verify(rechargeProcessor).rechargePassengerMetroCard(eq(metroCard), eq(rechargeAmount + transactionFee));
+//        verify(metroStation).updateCollections(eq(transactionFee + journeyAmount));
+//        verify(metroCard).deductFare(eq(totalAmount));
+//    }
 
 }

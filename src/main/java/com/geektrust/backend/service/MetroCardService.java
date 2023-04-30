@@ -20,6 +20,6 @@ public class MetroCardService implements IMetroCardService<MetroCard>{
 
     @Override
     public Optional<MetroCard> getMetroCard(String MetroCardName) {
-        return metroCardRepository.find(MetroCardName).map(Optional::of).orElseGet(Optional::empty);
+        return metroCardRepository.find(MetroCardName);
     }
 }

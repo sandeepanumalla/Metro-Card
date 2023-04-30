@@ -42,7 +42,6 @@ public class ConsolePrinterServiceTest {
 
     @Test
     void sortPassengers_allSameValue_sortAlphabetically() {
-
         List<Map.Entry<PassengerType, Integer>> inputList = new ArrayList<>();
         inputList.add(new AbstractMap.SimpleEntry<>(PassengerType.ADULT, 2));
         inputList.add(new AbstractMap.SimpleEntry<>(PassengerType.KID, 2));

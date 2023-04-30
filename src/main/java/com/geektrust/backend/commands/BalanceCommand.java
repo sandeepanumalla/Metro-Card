@@ -5,7 +5,8 @@ import com.geektrust.backend.entities.MetroCard;
 import com.geektrust.backend.service.IMetroCardService;
 
 public class BalanceCommand implements ICommand{
-
+    private static final int TOKEN_METROCARD_NAME_INDEX = 1;
+    private static final int TOKEN_METROCARD_BALANCE_INDEX  = 2;
     IMetroCardService<MetroCard> metroCardService;
     public BalanceCommand(IMetroCardService<MetroCard> metroCardService){
         this.metroCardService = metroCardService;
@@ -13,6 +14,6 @@ public class BalanceCommand implements ICommand{
 
     @Override
     public void execute(List<String> tokens) {
-        metroCardService.registerMetroCard(tokens.get(1), Long.parseLong(tokens.get(2)));
+        metroCardService.registerMetroCard(tokens.get(TOKEN_METROCARD_NAME_INDEX), Long.parseLong(tokens.get(TOKEN_METROCARD_BALANCE_INDEX)));
     }
 }

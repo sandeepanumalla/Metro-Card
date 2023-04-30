@@ -23,7 +23,8 @@ public class MetroCardRepository implements IMetroCardRepository<MetroCard, Stri
     }
 
     public Optional<MetroCard> find(String name){
-        return Optional.of(metroCards.get(name));
+        MetroCard metroCard = metroCards.get(name);
+        return Optional.ofNullable(metroCard);
     }
 
     @Override
