@@ -3,11 +3,15 @@ package com.geektrust.backend.services;
 import com.geektrust.backend.entities.PassengerType;
 import com.geektrust.backend.service.ConsolePrinterService;
 import com.geektrust.backend.service.IConsolePrinterService;
+import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.PrintStream;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +22,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 public class ConsolePrinterServiceTest {
 
-    IConsolePrinterService consolePrinterService;
+
+    private IConsolePrinterService consolePrinterService;
+
+    @Mock
+    private PrintStream mockPrintStream;
+
+
+    private ArgumentCaptor<String> stringArgumentCaptor;
+
+//    @BeforeEach
+//    void setup() {
+//        consolePrinterService = new ConsolePrinterService(mockPrintStream, null);
+//    }
 
     @BeforeEach
     void setup() {

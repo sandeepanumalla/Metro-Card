@@ -60,7 +60,6 @@ public class MetroCardTest {
         }
     }
 
-
     @DisplayName("should set the passengerType for the given MetroCard")
     @Test
     public void testSetPassengerType() {

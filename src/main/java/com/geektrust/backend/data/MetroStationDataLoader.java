@@ -5,7 +5,7 @@ import com.geektrust.backend.repositories.IMetroStationRepository;
 
 public class MetroStationDataLoader {
 
-    final IMetroStationRepository<MetroStation, String> metroStationRepository;
+    private final IMetroStationRepository<MetroStation, String> metroStationRepository;
     public MetroStationDataLoader(IMetroStationRepository<MetroStation, String> passengerJourneyRepository) {
         this.metroStationRepository = passengerJourneyRepository;
     }

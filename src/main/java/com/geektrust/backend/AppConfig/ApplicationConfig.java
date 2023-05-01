@@ -3,7 +3,6 @@
     import com.geektrust.backend.Utils.DiscountCalculator;
     import com.geektrust.backend.Utils.RechargeProcessor;
     import com.geektrust.backend.commands.*;
-    import com.geektrust.backend.data.LoadProperties;
     import com.geektrust.backend.data.MetroStationDataLoader;
     import com.geektrust.backend.data.PassengerFaresLoader;
     import com.geektrust.backend.entities.MetroCard;
@@ -12,6 +11,10 @@
     import com.geektrust.backend.service.*;
 
     public class ApplicationConfig {
+
+        private final int PERCENT_CONVERSION_FACTOR = 100;
+        private final long SERVICE_FEE_PERCENTAGE = 2;
+        private final long RETURN_JOURNEY_DISCOUNT_PERCENTAGE = 50;
 
         public ApplicationConfig() {
             this.loadPassengerFares();
@@ -25,13 +28,9 @@
 
         private final RechargeProcessor rechargeProcessor = new RechargeProcessor();
 
-        int percentageConversionFactor = Integer.parseInt(LoadProperties.getProperty("percentage.conversion.factor"));
-        long serviceFeePercentage = Long.parseLong(LoadProperties.getProperty("service.fee.percentage"));
-        long discountPercentage = Long.parseLong(LoadProperties.getProperty("return.journey.discount.percentage"));
-
-        private final DiscountCalculator discountCalculator = new DiscountCalculator(discountPercentage, percentageConversionFactor);
+        private final DiscountCalculator discountCalculator = new DiscountCalculator(RETURN_JOURNEY_DISCOUNT_PERCENTAGE, PERCENT_CONVERSION_FACTOR);
         IMetroStationService<MetroStation> metroStationService = new MetroStationService(metroStationRepository, metroCardService,
-                passengerJourneyService, passengerJourneyRepository, discountCalculator, rechargeProcessor, percentageConversionFactor, serviceFeePercentage);
+                passengerJourneyService, passengerJourneyRepository, discountCalculator, rechargeProcessor, PERCENT_CONVERSION_FACTOR, SERVICE_FEE_PERCENTAGE);
         IConsolePrinterService consolePrinterService = new ConsolePrinterService(metroStationRepository, passengerJourneyService);
 
         public void loadPassengerFares() {

@@ -10,7 +10,10 @@ public class PassengerJourneyRepository implements IPassengerJourneyRepository{
     private final Set<MetroCard> passengerTravelHistory = new HashSet<>();
     private final Map<PassengerType, Integer> fareForPassengerType = new HashMap<>();
 
-    public long getFareByPassengerType(PassengerType passenger) {
+    public long getFareByPassengerType(PassengerType passenger) throws NoSuchElementException {
+        if(!this.fareForPassengerType.containsKey(passenger)) {
+            throw new NoSuchElementException("This passenger type doesn't exist in db");
+        }
         return this.fareForPassengerType.get(passenger);
     }
     public void updatePassengerTravelHistory( MetroCard metroCard) {

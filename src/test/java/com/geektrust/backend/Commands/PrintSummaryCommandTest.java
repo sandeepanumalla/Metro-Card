@@ -15,7 +15,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PrintSummaryCommandTest {
-
     @Mock
     IConsolePrinterService consolePrinterService;
 
